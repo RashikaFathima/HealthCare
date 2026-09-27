@@ -1,0 +1,30 @@
+<app-page-header title="My Appointments" subtitle="Manage your patient appointments by status."></app-page-header>
+
+<div class="tab-bar mb-3">
+  @for (tab of tabs; track tab.key) {
+    <button type="button" class="tab-btn" [class.active]="activeTab() === tab.key" (click)="activeTab.set(tab.key)">{{ tab.label }}</button>
+  }
+</div>
+
+<app-search-filter searchPlaceholder="Search by patient name..." (searchChange)="onSearch($event)"></app-search-filter>
+
+@if (loading()) {
+  <app-loading-spinner label="Loading appointments..."></app-loading-spinner>
+} @else if (!filtered()!.length) {
+  <app-empty-state icon="fa-calendar-days" title="No appointments" message="There are no appointments in this category."></app-empty-state>
+} @else {
+  <div class="d-flex flex-column gap-3">
+    @for (apt of filtered(); track apt.id) {
+      <app-appointment-card [appointment]="apt" [displayNameOverride]="apt.patientName">
+        @if (apt.status === 'BOOKED' || apt.status === 'CHECKED_IN' || apt.status === 'IN_CONSULTATION') {
+          <button type="button" class="btn btn-gradient btn-sm" (click)="startConsultation(apt)">
+            {{ apt.status === 'IN_CONSULTATION' ? 'Resume' : 'Start' }} Consultation
+          </button>
+        }
+        @if (apt.status === 'IN_CONSULTATION') {
+          <button type="button" class="btn btn-outline-success btn-sm" (click)="markCompleted(apt)">Mark Completed</button>
+        }
+      </app-appointment-card>
+    }
+  </div>
+}

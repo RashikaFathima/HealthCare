@@ -1,0 +1,44 @@
+<app-page-header title="Front Desk Dashboard" subtitle="Today's appointments and patient check-in overview.">
+  <a routerLink="/receptionist/queue" class="btn btn-gradient"><i class="fa-solid fa-list-ol me-2"></i>Manage Queue</a>
+</app-page-header>
+
+@if (loading()) {
+  <div class="row g-3 mb-4">
+    @for (i of [1,2,3,4]; track i) {
+      <div class="col-6 col-lg-3"><div class="card-surface p-3"><app-skeleton-loader [rows]="2"></app-skeleton-loader></div></div>
+    }
+  </div>
+} @else {
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Today's Queue" [value]="stats().todaysAppointments" icon="fa-list-ol" iconBg="rgba(37,99,235,0.12)" iconColor="#2563EB"></app-dashboard-stat-card>
+    </div>
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Checked-In Patients" [value]="stats().checkedInPatients" icon="fa-user-check" iconBg="rgba(16,185,129,0.12)" iconColor="#10B981"></app-dashboard-stat-card>
+    </div>
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Pending Appointments" [value]="stats().pendingAppointments" icon="fa-hourglass-half" iconBg="rgba(245,158,11,0.12)" iconColor="#F59E0B"></app-dashboard-stat-card>
+    </div>
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Cancelled Bookings" [value]="stats().cancelledBookings" icon="fa-calendar-xmark" iconBg="rgba(239,68,68,0.12)" iconColor="#EF4444"></app-dashboard-stat-card>
+    </div>
+  </div>
+}
+
+<div class="section-block">
+  <div class="section-head">
+    <h5>Today's Queue Preview</h5>
+    <a routerLink="/receptionist/queue" class="small">Go to full queue</a>
+  </div>
+  @if (loading()) {
+    <app-skeleton-loader [rows]="3" [height]="60"></app-skeleton-loader>
+  } @else if (!todaysQueue().length) {
+    <app-empty-state icon="fa-calendar-check" title="No appointments today" message="The queue will populate as patients are booked in."></app-empty-state>
+  } @else {
+    <div class="d-flex flex-column gap-3">
+      @for (apt of todaysQueue(); track apt.id) {
+        <app-appointment-card [appointment]="apt" [displayNameOverride]="apt.patientName"></app-appointment-card>
+      }
+    </div>
+  }
+</div>

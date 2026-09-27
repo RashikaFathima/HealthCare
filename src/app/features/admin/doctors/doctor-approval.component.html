@@ -1,0 +1,35 @@
+<app-page-header title="Doctor Approval" subtitle="Review and approve pending doctor applications."></app-page-header>
+
+@if (loading()) {
+  <app-loading-spinner label="Loading applications..."></app-loading-spinner>
+} @else if (!pending().length) {
+  <app-empty-state icon="fa-circle-check" title="No pending applications" message="All doctor applications have been reviewed."></app-empty-state>
+} @else {
+  <div class="row g-3">
+    @for (doc of pending(); track doc.id) {
+      <div class="col-12 col-lg-6">
+        <div class="card-surface p-3 approval-card">
+          <div class="d-flex gap-3 align-items-start">
+            <app-user-avatar [name]="doc.fullName" [size]="52"></app-user-avatar>
+            <div class="flex-grow-1">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h6 class="mb-0">{{ doc.fullName }}</h6>
+                  <span class="text-muted small">{{ doc.specialization }} &middot; {{ doc.experienceYears }} yrs exp.</span>
+                </div>
+                <app-status-badge [status]="doc.approvalStatus"></app-status-badge>
+              </div>
+              <p class="text-muted small mt-2 mb-2">{{ doc.bio }}</p>
+              <p class="small mb-0"><strong>Qualification:</strong> {{ doc.qualification }}</p>
+              <p class="small"><strong>Contact:</strong> {{ doc.email }} &middot; {{ doc.phone }}</p>
+              <div class="d-flex gap-2 mt-3">
+                <button type="button" class="btn btn-gradient btn-sm" (click)="approve(doc)"><i class="fa-solid fa-check me-1"></i> Approve</button>
+                <button type="button" class="btn btn-outline-danger btn-sm" (click)="reject(doc)"><i class="fa-solid fa-xmark me-1"></i> Reject</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

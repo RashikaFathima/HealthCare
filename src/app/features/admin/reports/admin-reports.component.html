@@ -1,0 +1,52 @@
+<app-page-header title="Reports & Analytics" subtitle="Appointment trends, department load, and doctor statistics.">
+  <div class="btn-group">
+    <button type="button" class="btn btn-sm" [class.btn-gradient]="dateRange()==='7d'" [class.btn-outline-secondary]="dateRange()!=='7d'" (click)="setRange('7d')">7D</button>
+    <button type="button" class="btn btn-sm" [class.btn-gradient]="dateRange()==='30d'" [class.btn-outline-secondary]="dateRange()!=='30d'" (click)="setRange('30d')">30D</button>
+    <button type="button" class="btn btn-sm" [class.btn-gradient]="dateRange()==='90d'" [class.btn-outline-secondary]="dateRange()!=='90d'" (click)="setRange('90d')">90D</button>
+  </div>
+</app-page-header>
+
+@if (loading()) {
+  <app-loading-spinner label="Crunching the numbers..."></app-loading-spinner>
+} @else {
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Total Users" [value]="totalUsers()" icon="fa-users" iconBg="rgba(37,99,235,0.12)" iconColor="#2563EB"></app-dashboard-stat-card>
+    </div>
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Total Doctors" [value]="totalDoctors()" icon="fa-user-doctor" iconBg="rgba(6,182,212,0.12)" iconColor="#06B6D4"></app-dashboard-stat-card>
+    </div>
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Approved Doctors" [value]="approvedDoctors()" icon="fa-circle-check" iconBg="rgba(16,185,129,0.12)" iconColor="#10B981"></app-dashboard-stat-card>
+    </div>
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Pending Doctors" [value]="pendingDoctors()" icon="fa-hourglass-half" iconBg="rgba(245,158,11,0.12)" iconColor="#F59E0B"></app-dashboard-stat-card>
+    </div>
+  </div>
+
+  <div class="chart-card mb-4">
+    <h5 class="mb-3">Appointment Analytics (Booked / Completed / Cancelled)</h5>
+    @if (appointmentAnalytics()) {
+      <app-chart-panel type="line" [data]="appointmentAnalytics()" [height]="320"></app-chart-panel>
+    }
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="chart-card">
+        <h5 class="mb-3">Department Statistics</h5>
+        @if (departmentStats()) {
+          <app-chart-panel type="bar" [data]="departmentStats()" [height]="280"></app-chart-panel>
+        }
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="chart-card">
+        <h5 class="mb-3">Weekly Consultation Volume</h5>
+        @if (weeklyConsultations()) {
+          <app-chart-panel type="line" [data]="weeklyConsultations()" [height]="280"></app-chart-panel>
+        }
+      </div>
+    </div>
+  </div>
+}

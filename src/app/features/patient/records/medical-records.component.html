@@ -1,0 +1,15 @@
+<app-page-header title="Medical Records" subtitle="Your consultation history, diagnoses, and prescriptions."></app-page-header>
+
+<app-search-filter searchPlaceholder="Search by diagnosis, doctor, or specialization..." (searchChange)="onSearch($event)"></app-search-filter>
+
+@if (loading()) {
+  <app-loading-spinner label="Loading your medical records..."></app-loading-spinner>
+} @else if (!filtered().length) {
+  <app-empty-state icon="fa-file-medical" title="No medical records found" message="Records from your completed visits will appear here."></app-empty-state>
+} @else {
+  <div class="d-flex flex-column gap-3">
+    @for (rec of filtered(); track rec.id) {
+      <app-record-card [record]="rec" (download)="download($event)"></app-record-card>
+    }
+  </div>
+}

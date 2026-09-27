@@ -1,0 +1,92 @@
+<app-page-header title="Welcome back{{ patient() ? ', ' + patient()!.fullName.split(' ')[0] : '' }} 👋"
+                  subtitle="Here's what's happening with your health today.">
+  <a routerLink="/patient/book-appointment" class="btn btn-gradient"><i class="fa-solid fa-calendar-plus me-2"></i>Book Appointment</a>
+</app-page-header>
+
+@if (loading()) {
+  <div class="row g-3 mb-4">
+    @for (i of [1,2,3,4]; track i) {
+      <div class="col-6 col-lg-3"><div class="card-surface p-3"><app-skeleton-loader [rows]="2"></app-skeleton-loader></div></div>
+    }
+  </div>
+} @else {
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Upcoming Appointments" [value]="upcomingAppointments().length" icon="fa-calendar-check" iconBg="rgba(37,99,235,0.12)" iconColor="#2563EB"></app-dashboard-stat-card>
+    </div>
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Medical Records" [value]="recentRecords().length" icon="fa-file-medical" iconBg="rgba(6,182,212,0.12)" iconColor="#06B6D4"></app-dashboard-stat-card>
+    </div>
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Prescriptions" [value]="recentPrescriptions().length" icon="fa-pills" iconBg="rgba(16,185,129,0.12)" iconColor="#10B981"></app-dashboard-stat-card>
+    </div>
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Completed Visits" [value]="stats().completedConsultations" icon="fa-circle-check" iconBg="rgba(245,158,11,0.12)" iconColor="#F59E0B"></app-dashboard-stat-card>
+    </div>
+  </div>
+}
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="section-block">
+      <div class="section-head">
+        <h5>Upcoming Appointments</h5>
+        <a routerLink="/patient/appointments" class="small">View all</a>
+      </div>
+      @if (loading()) {
+        <app-skeleton-loader [rows]="3" [height]="60"></app-skeleton-loader>
+      } @else if (!upcomingAppointments().length) {
+        <app-empty-state icon="fa-calendar-xmark" title="No upcoming appointments" message="Book your next appointment with a specialist.">
+          <a routerLink="/patient/doctors" class="btn btn-gradient btn-sm mt-2">Find a doctor</a>
+        </app-empty-state>
+      } @else {
+        <div class="d-flex flex-column gap-3">
+          @for (apt of upcomingAppointments(); track apt.id) {
+            <app-appointment-card [appointment]="apt">
+              <button type="button" class="btn btn-outline-danger btn-sm" (click)="cancelAppointment(apt.id)">Cancel</button>
+            </app-appointment-card>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="section-block mt-4">
+      <div class="section-head">
+        <h5>Recent Medical Records</h5>
+        <a routerLink="/patient/records" class="small">View all</a>
+      </div>
+      @if (loading()) {
+        <app-skeleton-loader [rows]="2" [height]="60"></app-skeleton-loader>
+      } @else if (!recentRecords().length) {
+        <app-empty-state icon="fa-file-medical" title="No medical records yet" message="Your visit history will appear here."></app-empty-state>
+      } @else {
+        <div class="d-flex flex-column gap-3">
+          @for (rec of recentRecords(); track rec.id) {
+            <app-record-card [record]="rec"></app-record-card>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="section-block">
+      <div class="section-head"><h5>Notifications</h5></div>
+      @if (loading()) {
+        <app-skeleton-loader [rows]="3"></app-skeleton-loader>
+      } @else {
+        <app-notification-panel [notifications]="notifications()" (markRead)="onMarkRead($event)"></app-notification-panel>
+      }
+    </div>
+
+    <div class="section-block mt-4">
+      <div class="section-head"><h5>Quick Actions</h5></div>
+      <div class="quick-actions">
+        <a routerLink="/patient/doctors" class="quick-action"><i class="fa-solid fa-user-doctor"></i> Find a Doctor</a>
+        <a routerLink="/patient/book-appointment" class="quick-action"><i class="fa-solid fa-calendar-plus"></i> Book Appointment</a>
+        <a routerLink="/patient/records" class="quick-action"><i class="fa-solid fa-file-medical"></i> View Records</a>
+        <a routerLink="/patient/profile" class="quick-action"><i class="fa-solid fa-user-pen"></i> Update Profile</a>
+      </div>
+    </div>
+  </div>
+</div>

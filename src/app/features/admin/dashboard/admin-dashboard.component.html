@@ -1,0 +1,154 @@
+<app-page-header
+title="Admin Dashboard"
+subtitle="System-wide overview of users, doctors, and appointments."
+
+>
+
+  <a routerLink="/admin/doctors" class="btn btn-gradient">
+    <i class="fa-solid fa-user-doctor me-2"></i>
+    Review Doctor Approvals
+  </a>
+</app-page-header>
+
+@if (loading()) {
+
+  <div class="row g-3 mb-4">
+    @for (i of [1, 2, 3, 4]; track i) {
+      <div class="col-6 col-lg-3">
+        <div class="card-surface p-3">
+          <app-skeleton-loader [rows]="2"></app-skeleton-loader>
+        </div>
+      </div>
+    }
+  </div>
+} @else {
+  <div class="row g-3 mb-4">
+
+```
+<div class="col-6 col-lg-3">
+  <app-dashboard-stat-card
+    label="Total Users"
+    [value]="stats().totalUsers ?? 0"
+    icon="fa-users"
+    iconBg="rgba(37,99,235,0.12)"
+    iconColor="#2563EB">
+  </app-dashboard-stat-card>
+</div>
+
+<div class="col-6 col-lg-3">
+  <app-dashboard-stat-card
+    label="Total Patients"
+    [value]="stats().totalPatients ?? 0"
+    icon="fa-user-injured"
+    iconBg="rgba(6,182,212,0.12)"
+    iconColor="#06B6D4">
+  </app-dashboard-stat-card>
+</div>
+
+<div class="col-6 col-lg-3">
+  <app-dashboard-stat-card
+    label="Total Doctors"
+    [value]="stats().totalDoctors ?? 0"
+    icon="fa-user-doctor"
+    iconBg="rgba(16,185,129,0.12)"
+    iconColor="#10B981">
+  </app-dashboard-stat-card>
+</div>
+
+<div class="col-6 col-lg-3">
+  <app-dashboard-stat-card
+    label="Total Appointments"
+    [value]="stats().totalAppointments ?? 0"
+    icon="fa-calendar-days"
+    iconBg="rgba(245,158,11,0.12)"
+    iconColor="#F59E0B">
+  </app-dashboard-stat-card>
+</div>
+```
+
+  </div>
+}
+
+<div class="row g-4">
+
+  <div class="col-lg-7">
+
+```
+<div class="chart-card mb-4">
+  <h5 class="mb-3">Appointment Analytics</h5>
+
+  @if (appointmentChart()) {
+    <app-chart-panel
+      type="line"
+      [data]="appointmentChart()!"
+      [height]="300">
+    </app-chart-panel>
+  }
+</div>
+
+<div class="chart-card">
+  <h5 class="mb-3">Department Statistics</h5>
+
+  @if (departmentChart()) {
+    <app-chart-panel
+      type="bar"
+      [data]="departmentChart()!"
+      [height]="280">
+    </app-chart-panel>
+  }
+</div>
+```
+
+  </div>
+
+  <div class="col-lg-5">
+
+```
+<div class="section-block">
+
+  <div class="section-head">
+    <h5>Pending Doctor Approvals</h5>
+
+    <a routerLink="/admin/doctors" class="small">
+      View all
+    </a>
+  </div>
+
+  @if (!pendingDoctors().length) {
+
+    <app-empty-state
+      icon="fa-circle-check"
+      title="All caught up"
+      message="There are no pending doctor approvals.">
+    </app-empty-state>
+
+  } @else {
+
+    <div class="d-flex flex-column gap-2">
+
+      @for (doc of pendingDoctors(); track doc.id) {
+
+        <div class="mini-row">
+
+          <strong>{{ doc.fullName }}</strong>
+
+          <span class="text-muted small d-block">
+            {{ doc.specialization }}
+            &middot;
+            {{ doc.experienceYears }} yrs
+          </span>
+
+        </div>
+
+      }
+
+    </div>
+
+  }
+
+</div>
+```
+
+  </div>
+
+</div>

@@ -1,0 +1,45 @@
+<app-page-header title="My Appointments" subtitle="Track, reschedule, or cancel your appointments.">
+  <div class="btn-group">
+    <button type="button" class="btn btn-sm" [class.btn-gradient]="view()==='list'" [class.btn-outline-secondary]="view()!=='list'" (click)="view.set('list')">List</button>
+    <button type="button" class="btn btn-sm" [class.btn-gradient]="view()==='timeline'" [class.btn-outline-secondary]="view()!=='timeline'" (click)="view.set('timeline')">Timeline</button>
+  </div>
+</app-page-header>
+
+<app-search-filter
+  searchPlaceholder="Search by doctor or specialization..."
+  filterPlaceholder="All statuses"
+  [filterOptions]="statusOptions"
+  (searchChange)="onSearch($event)"
+  (filterChange)="onFilter($event)">
+</app-search-filter>
+
+@if (loading()) {
+  <app-loading-spinner label="Loading your appointments..."></app-loading-spinner>
+} @else if (!filtered().length) {
+  <app-empty-state icon="fa-calendar-days" title="No appointments found" message="Try adjusting your filters, or book a new appointment."></app-empty-state>
+} @else if (view() === 'list') {
+  <div class="d-flex flex-column gap-3">
+    @for (apt of filtered(); track apt.id) {
+      <app-appointment-card [appointment]="apt">
+        @if (canCancel(apt)) {
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="cancel(apt)">Cancel</button>
+        }
+      </app-appointment-card>
+    }
+  </div>
+} @else {
+  <div class="timeline">
+    @for (apt of filtered(); track apt.id) {
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="d-flex justify-content-between align-items-center">
+            <strong>{{ apt.date | date:'mediumDate' }} &middot; {{ apt.timeSlot }}</strong>
+          </div>
+          <p class="mb-1">{{ apt.doctorName }} — {{ apt.specialization }}</p>
+          <p class="text-muted small mb-0">{{ apt.reason }}</p>
+        </div>
+      </div>
+    }
+  </div>
+}

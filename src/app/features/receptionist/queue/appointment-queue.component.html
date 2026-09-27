@@ -1,0 +1,29 @@
+<app-page-header title="Patient Queue" subtitle="Check in patients and manage today's queue order."></app-page-header>
+
+<app-search-filter searchPlaceholder="Search by patient or doctor..." (searchChange)="onSearch($event)"></app-search-filter>
+
+@if (loading()) {
+  <app-loading-spinner label="Loading today's queue..."></app-loading-spinner>
+} @else if (!filtered().length) {
+  <app-empty-state icon="fa-list-ol" title="Queue is empty" message="No appointments scheduled for today yet."></app-empty-state>
+} @else {
+  <div class="queue-list">
+    @for (apt of filtered(); track apt.id) {
+      <div class="queue-row">
+        <div class="queue-number">{{ apt.queueNumber ?? '—' }}</div>
+        <app-user-avatar [name]="apt.patientName" [size]="44"></app-user-avatar>
+        <div class="queue-info">
+          <strong>{{ apt.patientName }}</strong>
+          <span class="text-muted small d-block">{{ apt.doctorName }} &middot; {{ apt.timeSlot }} &middot; {{ apt.specialization }}</span>
+        </div>
+        <app-status-badge [status]="apt.status"></app-status-badge>
+        <div class="queue-actions">
+          @if (canCheckIn(apt)) {
+            <button type="button" class="btn btn-gradient btn-sm" (click)="checkIn(apt)"><i class="fa-solid fa-user-check me-1"></i> Check In</button>
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="markNoShow(apt)">No-show</button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

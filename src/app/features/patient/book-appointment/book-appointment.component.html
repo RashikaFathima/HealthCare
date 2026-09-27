@@ -1,0 +1,100 @@
+<app-page-header title="Book an Appointment" subtitle="Follow the steps below to schedule your visit."></app-page-header>
+
+@if (bookingSuccess()) {
+  <div class="success-panel route-fade-enter">
+    <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+    <h4>Appointment Booked!</h4>
+    <p class="text-muted">Your appointment with {{ selectedDoctor()?.fullName }} on {{ selectedDate() }} at {{ selectedSlot()?.startTime }} is confirmed.</p>
+    <div class="d-flex gap-2 justify-content-center mt-3">
+      <button type="button" class="btn btn-outline-secondary" (click)="bookAnother()">Book another</button>
+      <button type="button" class="btn btn-gradient" (click)="goToAppointments()">View my appointments</button>
+    </div>
+  </div>
+} @else {
+  <div class="stepper-track mb-4">
+    @for (s of [1,2,3]; track s) {
+      <div class="step-dot" [class.active]="step() >= s" [class.current]="step() === s">
+        <span>{{ s }}</span>
+      </div>
+    }
+  </div>
+
+  @if (step() === 1) {
+    <div class="card-surface p-4">
+      <h5 class="mb-3">Step 1 — Select a Doctor</h5>
+      @if (loadingDoctors()) {
+        <app-loading-spinner label="Loading doctors..."></app-loading-spinner>
+      } @else {
+        <div class="row g-3">
+          @for (doc of doctors(); track doc.id) {
+            <div class="col-12 col-md-6 col-lg-4">
+              <button type="button" class="doctor-pick" [class.selected]="selectedDoctor()?.id === doc.id" (click)="selectDoctor(doc)">
+                <strong>{{ doc.fullName }}</strong>
+                <span class="text-muted d-block small">{{ doc.specialization }} &middot; ₹{{ doc.consultationFee }}</span>
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  @if (step() === 2 && selectedDoctor()) {
+    <div class="card-surface p-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="mb-0">Step 2 — Select Date &amp; Slot</h5>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="backTo(1)">Change doctor</button>
+      </div>
+      <p class="text-muted">Booking with <strong>{{ selectedDoctor()!.fullName }}</strong> ({{ selectedDoctor()!.specialization }})</p>
+
+      <div class="mb-3" style="max-width: 260px;">
+        <label class="form-label">Appointment date</label>
+        <input type="date" class="form-control" [min]="minDate" [value]="selectedDate()" (change)="onDateChange($any($event.target).value)" />
+      </div>
+
+      @if (selectedDate()) {
+        @if (loadingSlots()) {
+          <app-loading-spinner label="Checking availability..."></app-loading-spinner>
+        } @else if (!availableSlots().length) {
+          <app-empty-state icon="fa-calendar-xmark" title="No slots available" message="Please choose a different date."></app-empty-state>
+        } @else {
+          <div class="slot-grid">
+            @for (slot of availableSlots(); track slot.id) {
+              <button type="button" class="slot-btn" [class.selected]="selectedSlot()?.id === slot.id" (click)="selectSlot(slot)">
+                {{ slot.startTime }}
+              </button>
+            }
+          </div>
+          <button type="button" class="btn btn-gradient mt-4" [disabled]="!selectedSlot()" (click)="goToReason()">Continue</button>
+        }
+      }
+    </div>
+  }
+
+  @if (step() === 3 && selectedDoctor() && selectedSlot()) {
+    <div class="card-surface p-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="mb-0">Step 3 — Reason &amp; Confirmation</h5>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="backTo(2)">Change slot</button>
+      </div>
+
+      <div class="summary-box mb-3">
+        <div><span class="label">Doctor</span><span>{{ selectedDoctor()!.fullName }}</span></div>
+        <div><span class="label">Date</span><span>{{ selectedDate() }}</span></div>
+        <div><span class="label">Time</span><span>{{ selectedSlot()!.startTime }}</span></div>
+        <div><span class="label">Fee</span><span>₹{{ selectedDoctor()!.consultationFee }}</span></div>
+      </div>
+
+      <form [formGroup]="reasonForm" (ngSubmit)="confirmBooking()">
+        <label class="form-label">Reason for visit</label>
+        <textarea class="form-control" rows="3" formControlName="reason" placeholder="Briefly describe your symptoms or reason for the visit..."></textarea>
+        @if (reasonForm.get('reason')?.invalid && reasonForm.get('reason')?.touched) {
+          <div class="invalid-feedback d-block">Please provide at least 6 characters.</div>
+        }
+        <button type="submit" class="btn btn-gradient mt-3" [disabled]="submitting()">
+          @if (submitting()) { <i class="fa-solid fa-spinner fa-spin me-2"></i> Booking... } @else { Confirm Booking }
+        </button>
+      </form>
+    </div>
+  }
+}

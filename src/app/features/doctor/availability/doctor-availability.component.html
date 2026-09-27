@@ -1,0 +1,65 @@
+<app-page-header title="Manage Availability" subtitle="Add, edit, or remove your consultation time slots."></app-page-header>
+
+@if (loading()) {
+  <app-loading-spinner label="Loading your availability..."></app-loading-spinner>
+} @else {
+  <div class="card-surface p-3 mb-4">
+    <div class="calendar-strip">
+      @for (day of upcomingDays; track day) {
+        <button type="button" class="day-chip" [class.selected]="selectedDate() === day" (click)="selectDate(day)">
+          <span class="day-num">{{ day | date:'d' }}</span>
+          <span class="day-name">{{ day | date:'EEE' }}</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card-surface p-4">
+        <h6 class="section-title">Add a Time Slot</h6>
+        <form [formGroup]="form" (ngSubmit)="addSlot()">
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">Start time</label>
+              <input type="time" class="form-control" formControlName="startTime" />
+            </div>
+            <div class="col-6">
+              <label class="form-label">End time</label>
+              <input type="time" class="form-control" formControlName="endTime" />
+            </div>
+          </div>
+          @if (formError()) {
+            <div class="invalid-feedback d-block mt-2">{{ formError() }}</div>
+          }
+          <button type="submit" class="btn btn-gradient mt-3 w-100" [disabled]="saving()">
+            @if (saving()) { <i class="fa-solid fa-spinner fa-spin me-2"></i> Adding... } @else { <i class="fa-solid fa-plus me-2"></i> Add Slot }
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card-surface p-4">
+        <h6 class="section-title">Slots on {{ selectedDate() | date:'fullDate' }}</h6>
+        @if (!slotsForSelectedDate().length) {
+          <app-empty-state icon="fa-calendar-xmark" title="No slots yet" message="Add your first slot for this date using the form."></app-empty-state>
+        } @else {
+          <div class="slot-list">
+            @for (slot of slotsForSelectedDate(); track slot.id) {
+              <div class="slot-row" [class.booked]="slot.isBooked">
+                <div>
+                  <strong>{{ slot.startTime }} - {{ slot.endTime }}</strong>
+                  <span class="text-muted small d-block">{{ slot.isBooked ? 'Booked' : 'Available' }}</span>
+                </div>
+                @if (!slot.isBooked) {
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeSlot(slot)"><i class="fa-solid fa-trash"></i></button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}

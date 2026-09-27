@@ -1,0 +1,32 @@
+<app-page-header title="User Management" subtitle="View, search, and manage all system users."></app-page-header>
+
+<app-search-filter
+  searchPlaceholder="Search by name or email..."
+  filterPlaceholder="All roles"
+  [filterOptions]="roleOptions"
+  (searchChange)="onSearch($event)"
+  (filterChange)="onFilter($event)">
+</app-search-filter>
+
+<app-data-table [columns]="columns" [rows]="filtered()" [loading]="loading()" emptyIcon="fa-users" emptyTitle="No users found">
+  <ng-template #cellTemplate let-row let-col="col">
+    @switch (col.key) {
+      @case ('user') {
+        <div class="d-flex align-items-center gap-2">
+          <app-user-avatar [name]="row.fullName" [size]="34"></app-user-avatar>
+          <div>
+            <div class="fw-semibold">{{ row.fullName }}</div>
+            <div class="text-muted small">{{ row.email }}</div>
+          </div>
+        </div>
+      }
+      @case ('status') { <app-status-badge [status]="row.isActive ? 'ACTIVE' : 'INACTIVE'"></app-status-badge> }
+      @case ('actions') {
+        <button type="button" class="btn btn-sm" [class.btn-outline-danger]="row.isActive" [class.btn-outline-success]="!row.isActive" (click)="toggleStatus(row)">
+          {{ row.isActive ? 'Deactivate' : 'Activate' }}
+        </button>
+      }
+      @default { {{ row[col.key] || '—' }} }
+    }
+  </ng-template>
+</app-data-table>

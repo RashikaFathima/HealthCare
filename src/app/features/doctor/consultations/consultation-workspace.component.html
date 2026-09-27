@@ -1,0 +1,95 @@
+<app-page-header title="Consultation Workspace" subtitle="Document symptoms, diagnosis, and follow-up for your patients."></app-page-header>
+
+@if (loading()) {
+  <app-loading-spinner label="Loading active cases..."></app-loading-spinner>
+} @else {
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card-surface p-3">
+        <h6 class="section-title">Active Cases</h6>
+        @if (!activeCases().length) {
+          <app-empty-state icon="fa-stethoscope" title="No active cases" message="Checked-in patients will appear here."></app-empty-state>
+        } @else {
+          <div class="d-flex flex-column gap-2">
+            @for (c of activeCases(); track c.id) {
+              <button type="button" class="case-pick" [class.selected]="appointment()?.id === c.id" (click)="selectAppointment(c)">
+                <div class="d-flex justify-content-between align-items-center">
+                  <strong>{{ c.patientName }}</strong>
+                  <app-status-badge [status]="c.status"></app-status-badge>
+                </div>
+                <span class="text-muted small">{{ c.timeSlot }} &middot; {{ c.reason }}</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      @if (!appointment()) {
+        <div class="card-surface p-4">
+          <app-empty-state icon="fa-hand-pointer" title="Select a patient" message="Choose an active case from the left to begin the consultation."></app-empty-state>
+        </div>
+      } @else {
+        <div class="card-surface p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <h5 class="mb-0">{{ appointment()!.patientName }}</h5>
+              <p class="text-muted mb-0">{{ appointment()!.reason }}</p>
+            </div>
+            <app-status-badge [status]="appointment()!.status"></app-status-badge>
+          </div>
+
+          <form [formGroup]="form">
+            <div class="mb-3">
+              <label class="form-label">Symptoms</label>
+              <textarea class="form-control" rows="2" formControlName="symptoms" placeholder="Describe reported symptoms..."></textarea>
+              @if (form.get('symptoms')?.invalid && form.get('symptoms')?.touched) {
+                <div class="invalid-feedback d-block">Symptoms are required (min 5 characters).</div>
+              }
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Diagnosis</label>
+              <input class="form-control" formControlName="diagnosis" placeholder="Clinical diagnosis..." />
+              @if (form.get('diagnosis')?.invalid && form.get('diagnosis')?.touched) {
+                <div class="invalid-feedback d-block">Diagnosis is required.</div>
+              }
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Clinical Notes</label>
+              <textarea class="form-control" rows="3" formControlName="clinicalNotes" placeholder="Detailed clinical notes..."></textarea>
+              @if (form.get('clinicalNotes')?.invalid && form.get('clinicalNotes')?.touched) {
+                <div class="invalid-feedback d-block">Clinical notes are required.</div>
+              }
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-8">
+                <label class="form-label">Follow-up Instructions</label>
+                <input class="form-control" formControlName="followUpInstructions" placeholder="e.g. Review in 2 weeks" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Follow-up Date</label>
+                <input type="date" class="form-control" formControlName="followUpDate" />
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-3">
+              <button type="button" class="btn btn-outline-secondary" [disabled]="saving()" (click)="save(false)">
+                <i class="fa-solid fa-floppy-disk me-2"></i>Save Draft
+              </button>
+              <button type="button" class="btn btn-gradient" [disabled]="saving()" (click)="save(true)">
+                @if (saving()) { <i class="fa-solid fa-spinner fa-spin me-2"></i> Saving... } @else { <i class="fa-solid fa-check me-2"></i> Complete Consultation }
+              </button>
+              <a routerLink="/doctor/prescriptions" [queryParams]="{ appointmentId: appointment()!.id }" class="btn btn-outline-primary">
+                <i class="fa-solid fa-pills me-2"></i>Write Prescription
+              </a>
+            </div>
+          </form>
+        </div>
+      }
+    </div>
+  </div>
+}

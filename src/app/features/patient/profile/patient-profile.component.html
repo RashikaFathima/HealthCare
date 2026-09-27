@@ -1,0 +1,84 @@
+<app-page-header title="My Profile" subtitle="Keep your personal and contact details up to date.">
+  @if (!editMode()) {
+    <button type="button" class="btn btn-gradient" (click)="toggleEdit()"><i class="fa-solid fa-pen me-2"></i>Edit Profile</button>
+  }
+</app-page-header>
+
+@if (loading()) {
+  <app-loading-spinner label="Loading profile..."></app-loading-spinner>
+} @else if (patient()) {
+  <div class="card-surface p-4 mb-4 profile-head">
+    <app-user-avatar [name]="patient()!.fullName" [size]="72"></app-user-avatar>
+    <div>
+      <h4>{{ patient()!.fullName }}</h4>
+      <p class="text-muted mb-0">{{ patient()!.email }}</p>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="save()" class="card-surface p-4">
+    <h6 class="section-title">Personal Details</h6>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label class="form-label">Full name</label>
+        <input class="form-control" formControlName="fullName" [readonly]="!editMode()" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Date of birth</label>
+        <input type="date" class="form-control" formControlName="dateOfBirth" [readonly]="!editMode()" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Gender</label>
+        <select class="form-select" formControlName="gender" [disabled]="!editMode()">
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+          <option value="OTHER">Other</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Blood group</label>
+        <input class="form-control" formControlName="bloodGroup" [readonly]="!editMode()" placeholder="e.g. O+" />
+      </div>
+    </div>
+
+    <h6 class="section-title">Contact Details</h6>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" formControlName="email" [readonly]="!editMode()" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Phone</label>
+        <input class="form-control" formControlName="phone" [readonly]="!editMode()" />
+      </div>
+      <div class="col-12">
+        <label class="form-label">Address</label>
+        <textarea class="form-control" rows="2" formControlName="address" [readonly]="!editMode()"></textarea>
+      </div>
+    </div>
+
+    <h6 class="section-title">Emergency Contact</h6>
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <label class="form-label">Name</label>
+        <input class="form-control" formControlName="emergencyContactName" [readonly]="!editMode()" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Relationship</label>
+        <input class="form-control" formControlName="emergencyContactRelationship" [readonly]="!editMode()" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Phone</label>
+        <input class="form-control" formControlName="emergencyContactPhone" [readonly]="!editMode()" />
+      </div>
+    </div>
+
+    @if (editMode()) {
+      <div class="d-flex gap-2 justify-content-end mt-4">
+        <button type="button" class="btn btn-outline-secondary" (click)="toggleEdit()">Cancel</button>
+        <button type="submit" class="btn btn-gradient" [disabled]="saving()">
+          @if (saving()) { <i class="fa-solid fa-spinner fa-spin me-2"></i> Saving... } @else { Save Changes }
+        </button>
+      </div>
+    }
+  </form>
+}

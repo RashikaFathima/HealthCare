@@ -1,0 +1,80 @@
+<app-page-header title="Welcome{{ doctor() ? ', ' + doctor()!.fullName : '' }}"
+                  subtitle="Here's your schedule and consultation overview for today.">
+  <a routerLink="/doctor/availability" class="btn btn-gradient"><i class="fa-solid fa-calendar-plus me-2"></i>Manage Availability</a>
+</app-page-header>
+
+@if (loading()) {
+  <div class="row g-3 mb-4">
+    @for (i of [1,2,3,4]; track i) {
+      <div class="col-6 col-lg-3"><div class="card-surface p-3"><app-skeleton-loader [rows]="2"></app-skeleton-loader></div></div>
+    }
+  </div>
+} @else {
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Today's Appointments" [value]="stats().todaysAppointments" icon="fa-calendar-day" iconBg="rgba(37,99,235,0.12)" iconColor="#2563EB"></app-dashboard-stat-card>
+    </div>
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Completed Consultations" [value]="stats().completedConsultations" icon="fa-circle-check" iconBg="rgba(16,185,129,0.12)" iconColor="#10B981"></app-dashboard-stat-card>
+    </div>
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Pending Cases" [value]="stats().pendingCases" icon="fa-hourglass-half" iconBg="rgba(245,158,11,0.12)" iconColor="#F59E0B"></app-dashboard-stat-card>
+    </div>
+    <div class="col-6 col-lg-3">
+      <app-dashboard-stat-card label="Available Slots" [value]="stats().availableSlots" icon="fa-clock" iconBg="rgba(6,182,212,0.12)" iconColor="#06B6D4"></app-dashboard-stat-card>
+    </div>
+  </div>
+}
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="section-block">
+      <div class="section-head">
+        <h5>Today's Appointments</h5>
+        <a routerLink="/doctor/appointments" class="small">View all</a>
+      </div>
+      @if (loading()) {
+        <app-skeleton-loader [rows]="3" [height]="60"></app-skeleton-loader>
+      } @else if (!todaysAppointments().length) {
+        <app-empty-state icon="fa-calendar-check" title="No appointments today" message="Enjoy your free day, or update your availability."></app-empty-state>
+      } @else {
+        <div class="d-flex flex-column gap-3">
+          @for (apt of todaysAppointments(); track apt.id) {
+            <app-appointment-card [appointment]="apt" [displayNameOverride]="apt.patientName"></app-appointment-card>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="section-block mt-4">
+      <div class="section-head"><h5>Recent Patients</h5></div>
+      @if (!recentPatients().length) {
+        <app-empty-state icon="fa-users" title="No recent patients" message="Completed consultations will show here."></app-empty-state>
+      } @else {
+        <div class="d-flex flex-column gap-3">
+          @for (apt of recentPatients(); track apt.id) {
+            <app-appointment-card [appointment]="apt" [displayNameOverride]="apt.patientName"></app-appointment-card>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="chart-card">
+      <h5 class="mb-3">Weekly Consultation Statistics</h5>
+      @if (weeklyChart()) {
+        <app-chart-panel type="line" [data]="weeklyChart()"></app-chart-panel>
+      }
+    </div>
+
+    <div class="section-block mt-4">
+      <div class="section-head"><h5>Quick Actions</h5></div>
+      <div class="quick-actions">
+        <a routerLink="/doctor/availability" class="quick-action"><i class="fa-solid fa-calendar-plus"></i> Add Availability</a>
+        <a routerLink="/doctor/consultations" class="quick-action"><i class="fa-solid fa-stethoscope"></i> Start Consultation</a>
+        <a routerLink="/doctor/prescriptions" class="quick-action"><i class="fa-solid fa-pills"></i> Write Prescription</a>
+      </div>
+    </div>
+  </div>
+</div>

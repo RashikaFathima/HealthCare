@@ -1,0 +1,19 @@
+<app-page-header title="All Appointments" subtitle="Hospital-wide appointment records."></app-page-header>
+
+<app-search-filter
+  searchPlaceholder="Search by patient or doctor..."
+  filterPlaceholder="All statuses"
+  [filterOptions]="statusOptions"
+  (searchChange)="onSearch($event)"
+  (filterChange)="onFilter($event)">
+</app-search-filter>
+
+<app-data-table [columns]="columns" [rows]="filtered()" [loading]="loading()" emptyIcon="fa-calendar-days" emptyTitle="No appointments found">
+  <ng-template #cellTemplate let-row let-col="col">
+    @switch (col.key) {
+      @case ('status') { <app-status-badge [status]="row.status"></app-status-badge> }
+      @case ('date') { {{ row.date | date:'mediumDate' }} }
+      @default { {{ row[col.key] }} }
+    }
+  </ng-template>
+</app-data-table>

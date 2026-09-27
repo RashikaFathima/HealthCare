@@ -1,0 +1,29 @@
+<app-page-header title="Find a Doctor" subtitle="Browse specialists and book your next appointment."></app-page-header>
+
+<app-search-filter
+  searchPlaceholder="Search by name or specialization..."
+  filterPlaceholder="All specializations"
+  [filterOptions]="specializationOptions()"
+  (searchChange)="onSearch($event)"
+  (filterChange)="onFilter($event)">
+  <select class="form-select filter-select" style="max-width: 180px;" (change)="onSort($any($event.target).value)">
+    <option value="rating">Sort: Top rated</option>
+    <option value="experience">Sort: Most experienced</option>
+    <option value="fee">Sort: Lowest fee</option>
+  </select>
+</app-search-filter>
+
+@if (loading()) {
+  <app-loading-spinner label="Finding doctors..."></app-loading-spinner>
+} @else if (!filteredDoctors().length) {
+  <app-empty-state icon="fa-user-doctor" title="No doctors found" message="Try a different search term or specialization."></app-empty-state>
+} @else {
+  <div class="row g-3">
+    @for (doc of pagedDoctors(); track doc.id) {
+      <div class="col-12 col-sm-6 col-lg-4">
+        <app-doctor-card [doctor]="doc" (book)="bookDoctor($event)" (viewProfile)="viewProfile($event)"></app-doctor-card>
+      </div>
+    }
+  </div>
+  <app-pagination [page]="page()" [pageSize]="pageSize" [totalItems]="filteredDoctors().length" (pageChange)="page.set($event)"></app-pagination>
+}

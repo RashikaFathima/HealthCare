@@ -1,0 +1,55 @@
+// =========================================================
+// DESIGN TOKENS — single source of truth for the color system.
+// Do NOT hardcode hex values in feature components; use these
+// CSS custom properties (var(--color-primary) etc.) instead.
+// =========================================================
+
+:root {
+  // Brand palette (from spec)
+  --color-primary: #2563EB;
+  --color-primary-rgb: 37, 99, 235;
+  --color-secondary: #06B6D4;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+
+  --color-bg: #F8FAFC;
+  --color-card: #FFFFFF;
+  --color-border: #E2E8F0;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #64748B;
+  --color-text-muted: #94A3B8;
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 16px 40px rgba(15, 23, 42, 0.12);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --font-heading: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  --gradient-hero: linear-gradient(135deg, #2563EB 0%, #06B6D4 100%);
+  --sidebar-width: 264px;
+  --sidebar-width-collapsed: 84px;
+  --topbar-height: 72px;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #0B1220;
+  --color-card: #121B2E;
+  --color-border: #223049;
+  --color-text-primary: #F1F5F9;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.45);
+
+  color-scheme: dark;
+}
